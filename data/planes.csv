@@ -1,0 +1,6 @@
+# 4 Points: Axial Slices (Full volume width/height)
+0, 0, 250, 499, 0, 250, 0, 499, 250, 499, 499, 250
+# 4 Points: Coronal Slice (Middle)
+0, 250, 0, 499, 250, 0, 0, 250, 499, 499, 250, 499
+# 3 Points: Isosceles Triangle (Oblique)
+250, 250, 0, 250, 250, 499, 50, 50, 250

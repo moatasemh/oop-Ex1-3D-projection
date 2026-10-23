@@ -28,3 +28,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store.idea/
+
+### Project Specific ###
+data/Synthetic_500.nrrd
+*.mp4
