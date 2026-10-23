@@ -26,7 +26,9 @@ design is required (see SRS.md).
 python Ex0.py file.nrrd file.csv file.mp4
 
 ## Dataset
-NRRD files from 3D Slicer sample data (list + sizes).
+1. **MRHead.nrrd** (Real Data): Obtained from 3D Slicer sample data. Size: 256x256x130, Data Type: uint8. Used for the visual demo and functional testing.
+2. **Synthetic_500.nrrd** (Benchmark Data): A generated 500x500x500 volume (Data Type: uint8). Because the MRHead file is too small to test the performance requirement, this file is used to prove the ≥30 FPS requirement on a 500^3 matrix.
+3. **Planes.csv** (Coordinates): Contains test cases including 3-point planes (isosceles triangles) and 4-point planes (trapezoids).
 
 ## Testing
 See `docs/SRS.md` Testing. Covers: degenerate planes, out-of-volume p,
