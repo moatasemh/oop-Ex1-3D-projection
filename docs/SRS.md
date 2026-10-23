@@ -23,3 +23,18 @@ This document defines the requirements for a software tool that projects a plane
     1. A volumetric data file (`.nrrd`).
     2. A coordinates list (`.csv`).
 * **Output:** A video file (`.mp4`) containing the generated frames.
+
+## 5. Data Set
+To fulfill the requirements, the project uses the following datasets:
+1. **Primary Real Data (`MRHead.nrrd`):**
+    - **Source:** 3D Slicer open-source sample data.
+    - **Dimensions:** 256 x 256 x 130.
+    - **Data Type:** uint8 (unsigned 8-bit integer).
+    - **Purpose:** Used to validate the algorithm on real MRI data and generate the final demo video.
+2. **Performance Benchmark Data (`synthetic_500.nrrd`):**
+    - **Source:** Generated locally via a script.
+    - **Dimensions:** 500 x 500 x 500 (exactly 500^3 bytes).
+    - **Data Type:** uint8.
+    - **Purpose:** Specifically designed to measure throughput and prove the algorithm meets the ≥30 FPS requirement (as the MRHead is smaller than 500^3).
+3. **Coordinate Files (`.csv`):**
+    - Contains various plane definitions: axial slices (4 points), oblique triangles (3 points), and edge cases that fall outside the volume boundaries.
