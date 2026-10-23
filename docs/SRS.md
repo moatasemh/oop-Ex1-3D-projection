@@ -38,3 +38,25 @@ To fulfill the requirements, the project uses the following datasets:
     - **Purpose:** Specifically designed to measure throughput and prove the algorithm meets the ≥30 FPS requirement (as the MRHead is smaller than 500^3).
 3. **Coordinate Files (`.csv`):**
     - Contains various plane definitions: axial slices (4 points), oblique triangles (3 points), and edge cases that fall outside the volume boundaries.
+
+## 6. Testing Strategy
+To ensure the software is robust and meets all requirements, the following testing strategy is defined:
+
+### 6.1 Unit Testing
+- **NRRD & CSV Parsers:** Verify correct extraction of 3D matrices and coordinate lists. Edge cases (missing fields, invalid characters) should throw graceful errors.
+- **Geometry & EPS:** Test that planes violating the `|dist(a,b) - dist(a,c)| < 0.001` rule are rejected or handled safely.
+- **Boundary Checks (Out-of-Bounds):** Assert that any sampled coordinate `(x, y, z)` outside `[0, size-1]` returns a pixel value of `0`.
+
+### 6.2 Integration Testing
+- **3-Point vs. 4-Point Planes:** Test the vector-stepping algorithm separately for triangles and trapezoids to ensure correct matrix sizing (`Dab * Dbc`).
+
+### 6.3 Demo / End-to-End (E2E) Testing
+The system must pass the exact CLI demo requested in the assignment:
+`python Ex0.py file.nrrd file.csv file.mp4`
+- **Execution Test:** The script must execute without unhandled exceptions.
+- **Order of Frames:** The generated MP4 must contain one frame per CSV row, in the exact sequential order of the CSV list.
+- **Playability:** The output `.mp4` must be fully decodable by standard media players.
+
+### 6.4 Performance Testing
+- The demo will be executed on the `Synthetic_500.nrrd` dataset.
+- The runtime for generating the 2D projections (excluding video encoding overhead) must be measured. The test passes only if the throughput is **≥30 FPS** (target ≥100 FPS).
