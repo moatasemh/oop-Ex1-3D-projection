@@ -32,3 +32,6 @@ bin/
 ### Project Specific ###
 data/Synthetic_500.nrrd
 *.mp4
+
+__pycache__/
+*.pyc
