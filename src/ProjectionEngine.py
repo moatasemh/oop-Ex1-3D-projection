@@ -1,20 +1,18 @@
 from numba import njit
-import sys
 import numpy as np
-import nrrd
 from ProjectablePlane import ProjectablePlane
 from Volume3D import Volume3D
 
-@njit
+@njit # just in time decrator in numba library to compile this function as C code
 def _numba_project_plane(volume_data, start_a1, start_a2, v_ab, v_ac, H, W):
     """
-    פונקציית ליבה מהודרת ל-C. אין כאן אובייקטים, רק מתמטיקה טהורה.
-    זה מה שמבטיח ריצה ב-+30 FPS אפילו על נפחים ענקיים.
+   A fancy C core function. No objects here, just pure mathematics.
+   That's what guarantees a run of 30+ FPS even on massive volumes
     """
     E = np.zeros((H, W), dtype=np.uint8)
     shape_x, shape_y, shape_z = volume_data.shape
 
-    # שימוש ב-copy כדי לא לשנות את הקואורדינטות המקוריות
+    # copy used to avoid changing the real cordinats
     curr_a1 = start_a1.copy()
     curr_a2 = start_a2.copy()
 
@@ -34,7 +32,7 @@ def _numba_project_plane(volume_data, start_a1, start_a2, v_ab, v_ac, H, W):
         for x1 in range(int(d12) + 1):
             vx, vy, vz = int(round(p[0])), int(round(p[1])), int(round(p[2]))
 
-            # בדיקת גבולות (Numba עושה את זה יעיל כמעט כמו אפס פעולות שעון מעבד)
+            # Boundary checking (Numba makes it almost as efficient as zero CPU clock cycles)
             v = 0
             if 0 <= vx < shape_x and 0 <= vy < shape_y and 0 <= vz < shape_z:
                 v = volume_data[vx, vy, vz]

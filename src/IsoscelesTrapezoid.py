@@ -25,6 +25,16 @@ class IsoscelesTrapezoid(ProjectablePlane):
         D_a1b = np.linalg.norm(self.b - self.a1)
         if abs(D_a1b - D_a2c) >= 1e-2:
             raise ValueError(f"Invalid Trapezoid: Vectors are not equal length.")
+        D_a1a2 = np.linalg.norm(self.a2 - self.a1)
+        D_bc = np.linalg.norm(self.c - self.b)
+        if D_a1a2 > D_bc+1e-2:
+            raise ValueError("Invalid Trapezoid: the small base longer than the big one")
+        v1 = self.a2 - self.a1
+        v2 = self.b - self.a1
+        v3 = self.c - self.a1
+        volume = abs(np.dot(v1, np.cross(v2, v3)))
+        if volume > 1e-2:
+            raise ValueError("Invalid Trapezoid: the points are in thr same line")
 
     def get_parameters(self):
         return self.a1, self.a2, self.v_a1b, self.v_a2c, self.H, self.W

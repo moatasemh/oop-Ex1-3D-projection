@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+#strategy design pattern
 class ProjectablePlane(ABC):
     """interface should implement  each shape for this project  """
     @abstractmethod

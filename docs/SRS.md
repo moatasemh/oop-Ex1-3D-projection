@@ -1,62 +1,86 @@
-# Software Requirements Specification (SRS)
-**Project:** Ex1 — Planar Projection of 3D Volumetric Data
-**Course:** Introduction to Software Engineering (OOP/OOD)
-
 ## 1. Introduction
-This document defines the requirements for a software tool that projects a plane (defined by 3 or 4 points) from a 3D volumetric matrix (NRRD file) onto a 2D image matrix. The outputs are compiled into an MP4 video.
 
-## 2. Functional Requirements
-* **Data Reading:** The system shall read 3D raster data from standard NRRD files (e.g., MRHead.nrrd).
-* **Coordinates Parsing:** The system shall read a CSV file containing rows of coordinates representing planes (3 points for a triangle, 4 points for a trapezoid).
-* **Projection Algorithm:** For each plane, the system shall compute normalized vectors and sample the 3D volume using the step-by-step vector iteration algorithm defined in the project specifications.
-* **Out-of-Bounds:** If a sampled point in the plane falls outside the 3D matrix boundaries, its value shall be 0.
-* **Video Generation:** The system shall generate a single MP4 video file, where each frame corresponds to a computed 2D projection plane from the CSV in sequential order.
-* **CLI Execution:** The program shall run via command line exactly as: `python Ex0.py <file.nrrd> <file.csv> <file.mp4>`.
+### 1.1 Purpose
+This SRS defines the functional and non-functional requirements for a Python CLI tool that projects 2D planes from 3D NRRD volumes into MP4 videos. It serves as the contractual agreement for developers, testers, and the course instructor.
 
-## 3. Non-Functional Requirements
-* **Performance:** The algorithm must run at a minimum of 30 FPS, with a target of 100+ FPS for a 500^3 byte matrix.
-* **Precision:** Geometric validations (e.g., distance comparisons) must use an EPS tolerance of 0.001.
-* **Design:** The system shall be implemented in Java using solid Object-Oriented Design (OOD) principles.
+### 1.2 Scope
+The system is a standalone backend processing engine. It will:
+- Parse 3D volumetric data (NRRD) and geometric plane definitions (CSV).
+- Validate shapes (isosceles triangles and trapezoids) using an EPS tolerance of 0.001.
+- Execute a vector-stepping projection algorithm using **Numba (`@njit`)** for optimization.
+- Render outputs into an MP4 video using OpenCV.
+- **Performance Target:** ≥30 FPS (Must) and 100+ FPS (Target) on a 500³ volume.
 
-## 4. Inputs and Outputs
-* **Inputs:**
-    1. A volumetric data file (`.nrrd`).
-    2. A coordinates list (`.csv`).
-* **Output:** A video file (`.mp4`) containing the generated frames.
+### 1.3 Definitions
+- **NRRD:** Nearly Raw Raster Data (medical imaging format).
+- **Voxel:** A 3D pixel.
+- **FPS:** Frames Per Second (algorithmic throughput).
+- **EPS:** Epsilon tolerance for floating-point comparisons.
 
-## 5. Data Set
-To fulfill the requirements, the project uses the following datasets:
-1. **Primary Real Data (`MRHead.nrrd`):**
-    - **Source:** 3D Slicer open-source sample data.
-    - **Dimensions:** 256 x 256 x 130.
-    - **Data Type:** uint8 (unsigned 8-bit integer).
-    - **Purpose:** Used to validate the algorithm on real MRI data and generate the final demo video.
-2. **Performance Benchmark Data (`synthetic_500.nrrd`):**
-    - **Source:** Generated locally via a script.
-    - **Dimensions:** 500 x 500 x 500 (exactly 500^3 bytes).
-    - **Data Type:** uint8.
-    - **Purpose:** Specifically designed to measure throughput and prove the algorithm meets the ≥30 FPS requirement (as the MRHead is smaller than 500^3).
-3. **Coordinate Files (`.csv`):**
-    - Contains various plane definitions: axial slices (4 points), oblique triangles (3 points), and edge cases that fall outside the volume boundaries.
+---
 
-## 6. Testing Strategy
-To ensure the software is robust and meets all requirements, the following testing strategy is defined:
+## 2. Overall Description
 
-### 6.1 Unit Testing
-- **NRRD & CSV Parsers:** Verify correct extraction of 3D matrices and coordinate lists. Edge cases (missing fields, invalid characters) should throw graceful errors.
-- **Geometry & EPS:** Test that planes violating the `|dist(a,b) - dist(a,c)| < 0.001` rule are rejected or handled safely.
-- **Boundary Checks (Out-of-Bounds):** Assert that any sampled coordinate `(x, y, z)` outside `[0, size-1]` returns a pixel value of `0`.
+### 2.1 Product Perspective
+The system is a CLI application accessed via the command line. The design relies on Object-Oriented Principles (Facade, Strategy, Factory patterns) to ensure clean separation of concerns.
 
-### 6.2 Integration Testing
-- **3-Point vs. 4-Point Planes:** Test the vector-stepping algorithm separately for triangles and trapezoids to ensure correct matrix sizing (`Dab * Dbc`).
+### 2.2 Constraints
+- **Language:** Python 3.10+
+- **Dependencies:** `numpy`, `pynrrd`, `opencv-python`, `numba`.
+- **Execution:** Must run exactly as: `python Ex0.py <file.nrrd> <file.csv> <file.mp4>`.
 
-### 6.3 Demo / End-to-End (E2E) Testing
-The system must pass the exact CLI demo requested in the assignment:
-`python Ex0.py file.nrrd file.csv file.mp4`
-- **Execution Test:** The script must execute without unhandled exceptions.
-- **Order of Frames:** The generated MP4 must contain one frame per CSV row, in the exact sequential order of the CSV list.
-- **Playability:** The output `.mp4` must be fully decodable by standard media players.
+### 2.3 Assumptions
+- The NRRD file contains valid 3D data (1 <= sx, sy, sz < 1024).
+- The CSV contains rows of 9 (triangle) or 12 (trapezoid) comma-separated numbers.
+- Out-of-bounds sampling returns 0 (black pixel).
 
-### 6.4 Performance Testing
-- The demo will be executed on the `Synthetic_500.nrrd` dataset.
-- The runtime for generating the 2D projections (excluding video encoding overhead) must be measured. The test passes only if the throughput is **≥30 FPS** (target ≥100 FPS).
+---
+
+## 3. Specific Requirements
+
+### 3.1 Functional Requirements (FR)
+*Designed to be unambiguous, measurable, and traceable.*
+
+- **FR-01 (Data Parsing):** The system shall read `.nrrd` files, supporting raw and GZIP encodings.
+- **FR-02 (Normalization):** If the volume is not `uint8`, the system shall normalize it using Min-Max scaling to `uint8` (0-255).
+- **FR-03 (CSV Parsing):** The system shall parse rows of 9 or 12 numbers, ignoring empty lines and comments.
+- **FR-04 (Geometry Validation):** The system shall validate:
+  - 3-point: `|dist(a,b) - dist(a,c)| < 0.001`.
+  - 4-point: `|dist(a1,b) - dist(a2,c)| < 0.001` and `dist(a1,a2) <= dist(b,c) + 0.001`.
+- **FR-05 (Algorithm):** The system shall compute projections by stepping along normalized 3D vectors `v(ab)` and `v(ac)` as defined in the assignment.
+- **FR-06 (Boundaries):** Any sampled point `(x, y, z)` outside the matrix boundaries shall be assigned `0`.
+- **FR-07 (Canvas):** The system shall center each 2D frame on a black canvas of the maximum calculated width/height.
+- **FR-08 (Video):** The system shall generate a single `.mp4` video with one frame per valid CSV row, in sequential order.
+- **FR-09 (CLI):** The system shall execute via the exact CLI format specified in the constraints.
+
+### 3.2 Non-Functional Requirements (NFR)
+- **NFR-01 (Performance):** Algorithmic throughput (excluding video encoding) must be **≥30 FPS** on a 500³ volume, targeting **100+ FPS**.
+- **NFR-02 (Stability):** Invalid CSV rows (geometrically impossible) must be skipped gracefully with a warning, without crashing.
+- **NFR-03 (Design):** The system shall implement **Facade**, **Strategy** (`ProjectablePlane`), and **Factory** (`ShapeFactory`) design patterns.
+
+---
+
+## 4. Appendices
+
+### 4.1 Use Case: Execute Projection
+- **Actor:** Developer / User.
+- **Precondition:** Python dependencies installed; valid NRRD and CSV files exist.
+- **Main Flow:**
+  1. User executes `python Ex0.py data.nrrd planes.csv output.mp4`.
+  2. System loads and normalizes the NRRD volume.
+  3. System parses CSV and validates shapes.
+  4. System iterates through planes, running the projection algorithm.
+  5. System centers frames and writes to `output.mp4`.
+  6. System prints final FPS.
+- **Alternative Flow (Invalid Shape):** If a CSV row violates EPS rules, the system prints a warning, skips the row, and continues.
+- **Postcondition:** A playable `.mp4` is generated.
+
+### 4.2 Traceability Matrix
+| Assignment Step | SRS Requirement | Component / Class |
+| :--- | :--- | :--- |
+| Read NRRD | FR-01, FR-02 | `NrrdReader.py` |
+| Parse CSV | FR-03, FR-04 | `ShapeFactory.py`, `Ex0.py` |
+| Algorithm | FR-05, FR-06 | `ProjectionEngine.py` |
+| Video Output | FR-07, FR-08 | `OpenCvVideoWriter.py` |
+| CLI / Demo | FR-09 | `Ex0.py` |
+| Performance | NFR-01 | `ProjectionEngine.py` (`@njit`) |

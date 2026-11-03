@@ -2,7 +2,7 @@ from IsoscelesTriangle import IsoscelesTriangle
 from ProjectablePlane import ProjectablePlane
 from IsoscelesTrapezoid import IsoscelesTrapezoid
 
-
+#factory design pattern
 
 
 class ShapeFactory:
