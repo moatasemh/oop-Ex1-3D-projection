@@ -25,7 +25,7 @@ All generated MP4 files are located in this folder:
 - `output_onion.mp4`
 - `output_swiss.mp4`
 
-![MRHEAD.png](../../../../../OneDrive/%D8%A7%D9%84%D8%B5%D9%88%D8%B1/Screenshots/MRHEAD.png)
+![MRHEAD.png](MRHEAD.png)
 
 ---
 
@@ -43,7 +43,7 @@ The system processed 280 planes from the CSV file. To provide a complete picture
 - **Pure Algorithm Throughput:** **1623.39 FPS**
 - **End-to-End Throughput:** **714.52 FPS**
 
-![FPS_PROOF.png](../../../../../OneDrive/%D8%A7%D9%84%D8%B5%D9%88%D8%B1/Screenshots/FPS_PROOF.png)
+![FPS_PROOF.png](FPS_PROOF.png)
 
 ---
 
