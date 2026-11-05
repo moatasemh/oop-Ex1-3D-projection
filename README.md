@@ -31,10 +31,20 @@ The problem is intentionally under-specified. This project provides a robust des
   - `IsoscelesTrapezoid.py` — 4-point plane implementation.
   - `ShapeFactory.py` — Factory Pattern to instantiate shapes from CSV data.
   - `OpenCvVideoWriter.py` — Handles MP4 generation and frame centering.
-- `docs/` — Documentation.
+- `docs/` — Documentation and Experiment Results.
   - `SRS.md` — Software Requirements Specification.
   - `ALGORITHM.md` — Detailed algorithm breakdown.
-  - `EXPERIMENT.md` — Performance benchmark results.
+  - `TESTING.md` — Testing strategy and test cases explanation.
+  - `Experiment/` — Benchmark outputs and results.
+    - `EXPERIMENT.md` — Performance results and conclusions.
+    - `output_*.mp4` — Generated videos for various datasets (MRI, Croissant, etc.).
+    - `MRHEAD.png` — Screenshot of the video output.
+    - `FPS_PROOF.png` — Screenshot of the final FPS.
+- `tests/` — Automated test suite verifying geometry, engine performance, and robustness.
+  - `test_geometry.py`
+  - `test_engine.py`
+  - `test_epsilon_sensitivity.py`
+  - `test_reader.py`
 - `data/` — NRRD datasets and CSV coordinate lists.
 - `tools/` — Utility scripts for testing and benchmarking.
   - `generate_data.py` — Generates a massive 500x500x500 synthetic NRRD volume (with a central spherical blob) to benchmark and prove the 100+ FPS requirement, keeping the project independent of heavy external files.

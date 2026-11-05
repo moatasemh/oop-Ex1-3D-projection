@@ -11,6 +11,8 @@ class OpenCvVideoWriter(VideoWriter):
         self.max_h = max_h
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         self.writer = cv2.VideoWriter(filepath, fourcc, fps, (max_w, max_h), isColor=False)
+        if not self.writer.isOpened():
+            raise IOError("Could not open the video writer. Check if the 'mp4v' codec is available.")
         print(f"[Video Exporter] Initialized Canvas size: {max_w}x{max_h} at {fps} FPS")
 
     def add_frame(self, frame: np.ndarray):
