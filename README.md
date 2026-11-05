@@ -2,6 +2,10 @@
 
 **Author:** Moatasem · **Course:** OOP/OOD · **Language:** Python 3
 
+> 📄 **[Click here to view the non-technical Project Summary (PDF)](Project_Summary.pdf)** 
+> *A visual and simple explanation of the project, how it works, and its performance metrics.*
+
+
 ## Problem Definition
 Given a 3D raster data matrix (M) representing volumetric data (e.g., an MRI scan), and a plane (p) defined by 3 or 4 co-planar points, the objective is to compute a 2D matrix (image) representing the projection of that plane within the volume. 
 
@@ -11,7 +15,7 @@ The problem is intentionally under-specified. This project provides a robust des
 - **Data Parsing:** Reading 3D volumetric data (NRRD format) and parsing plane coordinates from CSV files.
 - **Geometric Validation:** Verifying that 3 or 4 points form a valid isosceles triangle or trapezoid (using an EPS tolerance).
 - **Algorithmic Core:** Implementing the vector-stepping planar rasterization algorithm defined in the assignment.
-- **Performance:** Achieving high runtime efficiency. Given a matrix of size 500³ bytes, the target is ≥30 FPS (Must) and 100+ FPS (Target). The implementation uses **Numba (`@njit`)** to compile the core algorithm to C-level machine code, achieving **178+ FPS**.
+- **Performance:** Achieving high runtime efficiency. Given a matrix of size 500³ bytes, the target is ≥30 FPS (Must) and 100+ FPS (Target). The implementation uses **Numba (`@njit`)** to compile the core algorithm to C-level machine code. Benchmarked on a 500³ volume, it achieved **1623+ FPS** on standard planes, and **458+ FPS** on a worst-case full 500x500 plane (pure algorithmic throughput).
 - **Video Generation:** Normalizing the 3D volume to 8-bit grayscale and compiling the sequence of computed 2D projection frames into a final MP4 video using **OpenCV**.
 
 ## Repository Layout
@@ -40,6 +44,7 @@ The problem is intentionally under-specified. This project provides a robust des
     - `output_*.mp4` — Generated videos for various datasets (MRI, Croissant, etc.).
     - `MRHEAD.png` — Screenshot of the video output.
     - `FPS_PROOF.png` — Screenshot of the final FPS.
+    - `2_FPS_PROOF.png` — Screenshot of the final FPS with worst csv input .
 - `tests/` — Automated test suite verifying geometry, engine performance, and robustness.
   - `test_geometry.py`
   - `test_engine.py`
@@ -75,6 +80,7 @@ The CSV files define the planes to be projected. Each line represents a plane an
 * **edge_cases.csv**: A dedicated coordinate file designed to stress-test the geometric validation logic (e.g., collinear points, invalid triangles, and broken trapezoids).
 * **swiss_roll.csv**: Coordinate planes tailored specifically for the Swiss roll cake volume.
 * **onion.csv**: Coordinate planes tailored for the onion volume.
+* **full_slice.csv**: A single plane covering the entire 500x500 bounding box of the synthetic volume, used specifically for the worst-case performance benchmark.
 ## Design Patterns & OOP Architecture
 To ensure a clean and extensible design, the project heavily utilizes Object-Oriented principles:
 - **Facade Pattern:** `Ex0.py` provides a simple interface, hiding the complex orchestration between the reader, engine, and video writer.
@@ -90,7 +96,14 @@ pip install numpy pynrrd opencv-python numba
 pip install pytest
 
 ```
+### ⚠️ Important Note: Generating the Benchmark Dataset
+Due to GitHub's file size restrictions (100MB limit), the massive **`Synthetic_500.nrrd` (122MB)** file is intentionally excluded from this repository via `.gitignore`. 
 
+Before running the performance benchmark (Step 8), you **must generate this file locally** by running the following script from the root directory:
+```bash
+python tools/generate_data.py
+
+```
 ### Running the Automated Tests (Testing Strategy)
 The project includes a robust test suite built with `pytest`, verifying three core principles: Maintainability, Robustness, and Efficiency.
 To run all tests (from the root directory), execute:

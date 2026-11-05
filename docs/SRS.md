@@ -54,7 +54,7 @@ The system is a CLI application accessed via the command line. The design relies
 - **FR-09 (CLI):** The system shall execute via the exact CLI format specified in the constraints.
 
 ### 3.2 Non-Functional Requirements (NFR)
-- **NFR-01 (Performance):** Algorithmic throughput (excluding video encoding) must be **≥30 FPS** on a 500³ volume, targeting **100+ FPS**.
+**NFR-01 (Performance):** Algorithmic throughput (excluding video encoding) must be **≥30 FPS** on a 500³ volume (tested using a full 500x500 plane), targeting **100+ FPS**.
 - **NFR-02 (Stability):** Invalid CSV rows (geometrically impossible) must be skipped gracefully with a warning, without crashing.
 - **NFR-03 (Design):** The system shall implement **Facade**, **Strategy** (`ProjectablePlane`), and **Factory** (`ShapeFactory`) design patterns.
 - **NFR-04 (Testability):** The system shall include an automated test suite (`pytest`) covering geometry validation, out-of-bounds robustness, and performance efficiency (≥30 FPS).

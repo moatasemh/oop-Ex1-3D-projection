@@ -18,12 +18,11 @@ The goal of this experiment is twofold:
 ## 3. Functional Validation (Output Videos)
 We executed the system on multiple real-world volumetric datasets to ensure the algorithm correctly samples the 3D space, centers the frames, and assigns `0` to out-of-bounds pixels. 
 
-All generated MP4 files are located in this folder:
-- `output_mrhead.mp4`
-- `output_biscuit.mp4`
-- `output_croissant.mp4`
-- `output_onion.mp4`
-- `output_swiss.mp4`
+All generated MP4 files are located in this folder. The videos prove the algorithm correctly samples the 3D space, centers the frames, and assigns `0` to out-of-bounds pixels:
+- `output_mrhead.mp4`: Shows coronal and axial slices of the brain. The skull and brain tissue are clearly visible, proving accurate voxel mapping.
+- `output_croissant.mp4`: Projects through a complex food scan, demonstrating the algorithm handles non-medical, irregular volumetric data correctly.
+- `output_biscuit.mp4` & `output_swiss.mp4`: Exhibit distinct layering (dough and cream), proving that the plane correctly slices through nested 3D structures.
+- `output_onion.mp4`: Shows concentric layers, validating the precision of the vector-stepping algorithm.
 
 ![MRHEAD.png](MRHEAD.png)
 
@@ -44,6 +43,22 @@ The system processed 280 planes from the CSV file. To provide a complete picture
 - **End-to-End Throughput:** **714.52 FPS**
 
 ![FPS_PROOF.png](FPS_PROOF.png)
+
+
+### 4.1 Worst-Case Scenario Benchmark (Full 500x500 Plane)
+To provide the most rigorous proof for the assignment's requirement, we also benchmarked the algorithm using a single plane that covers the **entire 500x500 bounding box** of the volume (`full_slice.csv`).
+
+- **Command:** `python Ex0.py data/Synthetic_500.nrrd data/full_slice.csv output_full_500.mp4`
+- **Canvas Size:** 500x500
+- **Total Planes Processed:** 1
+- **Pure Algorithm Throughput:** **458.04 FPS**
+- **End-to-End Throughput (with video encoding):** **164.82 FPS**
+
+**Analysis:** Even in this worst-case scenario (where the 2D output matrix is at its maximum possible size), the pure algorithm executes at **458 FPS**, which is over 4.5 times faster than the 100 FPS target. Remarkably, the End-to-End FPS (164.82) also remains above the 100+ FPS target, proving the entire pipeline is heavily optimized.
+
+
+![2_FPS_PROOF.png](2_FPS_PROOF.png)
+
 
 ---
 

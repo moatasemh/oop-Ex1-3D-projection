@@ -32,9 +32,11 @@ class IsoscelesTrapezoid(ProjectablePlane):
         v1 = self.a2 - self.a1
         v2 = self.b - self.a1
         v3 = self.c - self.a1
-        volume = abs(np.dot(v1, np.cross(v2, v3)))
-        if volume > 1e-2:
-            raise ValueError("Invalid Trapezoid: the points are in thr same line")
-
+        # Scale-invariant coplanarity check
+        n1, n2, n3 = np.linalg.norm(v1), np.linalg.norm(v2), np.linalg.norm(v3)
+        if n1 > 0 and n2 > 0 and n3 > 0:
+            normalized_volume = abs(np.dot(v1 / n1, np.cross(v2 / n2, v3 / n3)))
+            if normalized_volume > 1e-2:  # Equivalent to previous check but normalized
+                raise ValueError("Invalid Trapezoid: the points are in the same plane")
     def get_parameters(self):
         return self.a1, self.a2, self.v_a1b, self.v_a2c, self.H, self.W

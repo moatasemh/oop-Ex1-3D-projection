@@ -4,7 +4,7 @@ Our testing strategy is built on three core software engineering principles, as 
 
 ## 1. Efficiency 
 *Goal:* Prove the system handles massive 3D volumes within the strict performance requirements (≥30 FPS).
-*Implementation:* The `test_engine.py` file contains `test_fps_requremnts()`, which generates a simulated 500x500x500 volume in memory and runs the projection algorithm using a 256x256 plane. It uses `time.perf_counter()` to measure throughput.
+*Implementation:* The `test_engine.py` file contains `test_fps_requremnts()`, which generates a simulated 500x500x500 volume in memory and runs the projection algorithm using a full 500x500 plane (exactly matching the 500³ volume boundaries). It uses `time.perf_counter()` to measure throughput.
 *Proof:* The test asserts that the resulting FPS is strictly greater than 30. If a future code change slows down the system (e.g., accidentally removing the Numba `@njit` decorator), this test will immediately fail.
 
 ## 2. Robustness & Edge Cases 
