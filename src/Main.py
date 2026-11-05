@@ -60,15 +60,16 @@ def main(): #facade design pattern
                     print(f"[Warning] Unknown number of points ({num_points}) on row {line_num}")
                     continue
 
-
-                shape = ShapeFactory.create_shape(coords)
-                planes.append(shape)
-
+                try:
+                    shape = ShapeFactory.create_shape(coords)
+                    planes.append(shape)
+                except ValueError as geo_err:
+                    print(f"[Warning] Geometry error on row {line_num}: {geo_err}")
             except ValueError:
-                # An elegant handling of the title row (text cannot become a float)
+            # An elegant handling of the title row (text cannot become a float)
                 print(f" Skipping header text on row {line_num}")
             except Exception as e:
-                # Handling geometrically invalid shapes (or "Catching geometrically invalid shapes")
+                # Handle any other unexpected errors
                 print(f"[Warning] Skipping invalid shape on row {line_num}: {e}")
 
     if not planes:
@@ -86,23 +87,28 @@ def main(): #facade design pattern
     video_exporter = OpenCvVideoWriter(mp4_file, max_w, max_h)
 
     # 4. Orchestration: iterating over the planes, processing, and saving
+    if len(planes) > 0:
+        engine.project(volume, planes[0])
     print(f" Processing {len(planes)} shapes...")
-    start_time = time.perf_counter()
+    total_algo_time = 0.0
+    total_e2e_time = 0.0
     for i, plane in enumerate(planes, 1):
         # running the algorithm
+        t0 = time.perf_counter() # Measure ONLY algorithm execution
+        t_start_e2e=time.perf_counter() # Start measuring End-to-End (Total time)
         projected_frame = engine.project(volume, plane)
-
+        total_algo_time += (time.perf_counter() - t0)
         # saving the video
         video_exporter.add_frame(projected_frame)
+        total_e2e_time += (time.perf_counter() - t_start_e2e)
         print(f" -> Processed plane {i}/{len(planes)}")
 
-    end_time = time.perf_counter()
     video_exporter.release()
-    total_time = end_time - start_time
-    fps = len(planes) / total_time
+    algo_fps = len(planes) / total_algo_time if total_algo_time > 0 else 0
+    e2e_fps = len(planes) / total_e2e_time if total_e2e_time > 0 else 0
     print(f"Done! Video saved to: {mp4_file}")
-    print(f"FPS = {fps}")
-
+    print(f"Pure Algorithm FPS = {algo_fps:.2f}")
+    print(f"End to End FPS = {e2e_fps:.2f} -> algo+ Video Encoding")
 
 if __name__ == "__main__":
     main()

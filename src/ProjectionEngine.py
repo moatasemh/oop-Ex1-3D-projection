@@ -37,7 +37,7 @@ def _numba_project_plane(volume_data, start_a1, start_a2, v_ab, v_ac, H, W):
             if 0 <= vx < shape_x and 0 <= vy < shape_y and 0 <= vz < shape_z:
                 v = volume_data[vx, vy, vz]
 
-            x = int((W / 2.0) - (d12 / 2.0) + x1)
+            x = int(np.floor((W / 2.0) - (d12 / 2.0) + x1))
             if 0 <= x < W:
                 E[y, x] = v
 

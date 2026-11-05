@@ -43,7 +43,7 @@ The system is a CLI application accessed via the command line. The design relies
 
 - **FR-01 (Data Parsing):** The system shall read `.nrrd` files, supporting raw and GZIP encodings.
 - **FR-02 (Normalization):** If the volume is not `uint8`, the system shall normalize it using Min-Max scaling to `uint8` (0-255).
-- **FR-03 (CSV Parsing):** The system shall parse rows of 9 or 12 numbers, ignoring empty lines and comments.
+- **FR-03 (CSV Parsing):** The system shall parse rows where the first value dictates the number of points (3 or 4), followed by X, Y, Z coordinates (e.g., `3, x1,y1,z1, x2,y2,z2, x3,y3,z3`). Empty lines and comments are ignored.
 - **FR-04 (Geometry Validation):** The system shall validate:
   - 3-point: `|dist(a,b) - dist(a,c)| < 0.001`.
   - 4-point: `|dist(a1,b) - dist(a2,c)| < 0.001` and `dist(a1,a2) <= dist(b,c) + 0.001`.
@@ -57,6 +57,7 @@ The system is a CLI application accessed via the command line. The design relies
 - **NFR-01 (Performance):** Algorithmic throughput (excluding video encoding) must be **≥30 FPS** on a 500³ volume, targeting **100+ FPS**.
 - **NFR-02 (Stability):** Invalid CSV rows (geometrically impossible) must be skipped gracefully with a warning, without crashing.
 - **NFR-03 (Design):** The system shall implement **Facade**, **Strategy** (`ProjectablePlane`), and **Factory** (`ShapeFactory`) design patterns.
+- **NFR-04 (Testability):** The system shall include an automated test suite (`pytest`) covering geometry validation, out-of-bounds robustness, and performance efficiency (≥30 FPS).
 
 ---
 
@@ -76,11 +77,12 @@ The system is a CLI application accessed via the command line. The design relies
 - **Postcondition:** A playable `.mp4` is generated.
 
 ### 4.2 Traceability Matrix
-| Assignment Step | SRS Requirement | Component / Class |
-| :--- | :--- | :--- |
-| Read NRRD | FR-01, FR-02 | `NrrdReader.py` |
-| Parse CSV | FR-03, FR-04 | `ShapeFactory.py`, `Ex0.py` |
-| Algorithm | FR-05, FR-06 | `ProjectionEngine.py` |
-| Video Output | FR-07, FR-08 | `OpenCvVideoWriter.py` |
-| CLI / Demo | FR-09 | `Ex0.py` |
-| Performance | NFR-01 | `ProjectionEngine.py` (`@njit`) |
+| Assignment Step | SRS Requirement | Component / Class | Test File |
+| :--- | :--- | :--- | :--- |
+| Read NRRD | FR-01, FR-02 | `NrrdReader.py` | `test_reader.py` |
+| Parse CSV | FR-03, FR-04 | `ShapeFactory.py`, `Ex0.py` | `test_geometry.py` |
+| Algorithm | FR-05, FR-06 | `ProjectionEngine.py` | `test_epsilon_sensitivity.py` |
+| Video Output | FR-07, FR-08 | `OpenCvVideoWriter.py` | N/A (Covered in E2E) |
+| CLI / Demo | FR-09 | `Ex0.py` | N/A (Manual E2E) |
+| Performance | NFR-01 | `ProjectionEngine.py` (`@njit`) | `test_engine.py` |
+| Robustness/Geo | FR-04, NFR-02 | Shape Classes | `test_geometry.py` |

@@ -23,7 +23,7 @@ class IsoscelesTrapezoid(ProjectablePlane):
         """ checking the trapezoid"""
         D_a2c = np.linalg.norm(self.c - self.a2)
         D_a1b = np.linalg.norm(self.b - self.a1)
-        if abs(D_a1b - D_a2c) >= 1e-2:
+        if abs(D_a1b - D_a2c) >= 1e-3:
             raise ValueError(f"Invalid Trapezoid: Vectors are not equal length.")
         D_a1a2 = np.linalg.norm(self.a2 - self.a1)
         D_bc = np.linalg.norm(self.c - self.b)

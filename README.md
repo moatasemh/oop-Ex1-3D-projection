@@ -16,6 +16,12 @@ The problem is intentionally under-specified. This project provides a robust des
 
 ## Repository Layout
 - `Ex0.py` — The assignment entry point. Acts as a wrapper/router that forwards commands to `Main.py` to ensure proper execution from the root directory.
+- `conftest.py` — Pytest configuration file ensuring `src` modules are found during testing.
+- `tests/` — Automated test suite verifying geometry, engine performance, and robustness.
+  - `test_geometry.py` — Unit tests for triangle/trapezoid creation and EPS validation.
+  - `test_engine.py` — Tests for out-of-bounds sampling and 500³ FPS performance.
+  - `test_epsilon_sensitivity.py` — Tests coordinate shift sensitivity and EPS bounds.
+  - `test_reader.py` — Tests error handling for missing NRRD files.
 - `src/` — Source code files.
   - `Main.py` — The main entry point (Facade Pattern).
   - `NrrdReader.py` — Handles NRRD parsing and normalization.
@@ -46,13 +52,19 @@ The project includes a diverse dataset of NRRD files and corresponding CSV coord
 * **onion.nrrd** (4,760 KB): A smaller scan of an onion for rapid testing.
 
 ### 🎯 Coordinate Sets (CSV Files)
+The CSV files define the planes to be projected. Each line represents a plane and follows this strict format:
+*   The first number indicates the number of points (`3` for a triangle, `4` for a trapezoid).
+*   Followed by the X, Y, Z coordinates for each point.
+*   Example (Triangle): `3, 0,0,0, 100,0,0, 0,100,0`
+*   Example (Trapezoid): `4, 0,0,0, 100,0,0, 0,100,0, 100,100,0`
+
+*Here is the list of the provided coordinate sets:*
 * **head.csv**: Standard geometric test cases designed to work with the MRHead medical scan.
 * **croissant.csv**: Coordinate planes tailored specifically for the croissant volume.
 * **biscuit_cake.csv**: Coordinate planes tailored for the biscuit cake volume.
 * **edge_cases.csv**: A dedicated coordinate file designed to stress-test the geometric validation logic (e.g., collinear points, invalid triangles, and broken trapezoids).
 * **swiss_roll.csv**: Coordinate planes tailored specifically for the Swiss roll cake volume.
 * **onion.csv**: Coordinate planes tailored for the onion volume.
-
 ## Design Patterns & OOP Architecture
 To ensure a clean and extensible design, the project heavily utilizes Object-Oriented principles:
 - **Facade Pattern:** `Ex0.py` provides a simple interface, hiding the complex orchestration between the reader, engine, and video writer.
@@ -65,4 +77,12 @@ To ensure a clean and extensible design, the project heavily utilizes Object-Ori
 Make sure you have Python installed, then install the required libraries:
 ```bash
 pip install numpy pynrrd opencv-python numba
-pip install scipy
+pip install pytest
+
+```
+
+### Running the Automated Tests (Testing Strategy)
+The project includes a robust test suite built with `pytest`, verifying three core principles: Maintainability, Robustness, and Efficiency.
+To run all tests (from the root directory), execute:
+```bash
+python -m pytest -v tests/
